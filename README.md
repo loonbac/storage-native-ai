@@ -15,15 +15,19 @@
 
 El objetivo central de este proyecto es:
 
-> **Ejecutar un modelo de frontera de escala equivalente a DeepSeek-V4-Flash / Qwen3-235B a ~40 tokens/s utilizando una única GPU de consumo (NVIDIA RTX 3060 de 12 GB de VRAM), sin depender de clústeres de alto costo.**
+> **Ejecutar un modelo de frontera de escala equivalente a DeepSeek-V4-Flash a ~40 tokens/s utilizando una única GPU de consumo (NVIDIA RTX 3060 de 12 GB de VRAM), sin depender de clústeres de alto costo.**
+
+### Ancla experimental actual
+
+Para las fases iniciales de experimentación se utiliza **Qwen3-235B-A22B** (MoE con 235B totales / 22B activos, ~140 GB en Q4_K_M). **Este modelo no equivale en capacidad ni alcance a DeepSeek-V4-Flash**, sino que se emplea exclusivamente como *ancla experimental intermediaria* por compartir la arquitectura MoE gigante con pocos expertos activos y por ser el modelo más grande que cabe en el almacenamiento NVMe de trabajo disponible (~222 GB libres).
 
 ### Escalera de objetivos
 
 | Nivel | Meta | Estado |
 |---|---|---|
 | **0** | Demostrar inferencia fuera de VRAM | 🟢 **DEMOSTRADO** |
-| **1** | Modelo significativamente mayor que VRAM (11.8× VRAM) | 🟢 **DEMOSTRADO** |
-| **2** | Modelo 10× mayor que VRAM con caché de expertos | 🟡 *En progreso (Ciclo 2)* |
+| **1** | Modelo significativamente mayor que VRAM (11.8× VRAM, Qwen3-235B) | 🟢 **DEMOSTRADO** |
+| **2** | Modelo 10× mayor que VRAM con caché de expertos explícita | 🟡 *En progreso (Ciclo 2)* |
 | **3** | Modelo 50× mayor que VRAM | 🟠 Pendiente |
 | **4** | Modelo 100× mayor que VRAM | 🟠 Pendiente |
 | **5** | Modelo de frontera en producción local | 🟠 Pendiente |
