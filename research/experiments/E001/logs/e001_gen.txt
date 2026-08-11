@@ -1,0 +1,41 @@
+
+
+Loading model... |-\|/-\|/-\|/ 
+
+▄▄ ▄▄
+██ ██
+██ ██  ▀▀█▄ ███▄███▄  ▀▀█▄    ▄████ ████▄ ████▄
+██ ██ ▄█▀██ ██ ██ ██ ▄█▀██    ██    ██ ██ ██ ██
+██ ██ ▀█▄██ ██ ██ ██ ▀█▄██ ██ ▀████ ████▀ ████▀
+                                    ██    ██
+                                    ▀▀    ▀▀
+
+build      : b10333-8dc0728
+model      : models/Qwen2.5-7B-Instruct-Q4_K_M.gguf
+ftype      : Q4_K - Medium
+modalities : text
+
+available commands:
+  /exit or Ctrl+C     stop or exit
+  /regen              regenerate the last response
+  /clear              clear the chat history
+  /read <file>        add a text file
+  /glob <pattern>     add text files using globbing pattern
+
+
+
+> Escribe una breve explicación de qué es un modelo de lenguaje grande.
+Un modelo de lenguaje grande (o Modelo de Lenguaje de Gran Escala) es un tipo de red neuronal profunda que está entrenado en un enorme conjunto de datos de texto. Estos modelos pueden contener miles de millones de parámetros y están diseñados para capturar patrones complejos y relaciones semánticas en el lenguaje humano.
+
+Características principales de estos modelos:
+
+1. **Tamaño y Complejidad**: Generalmente, estos modelos son enormes, con miles de millones de parámetros, lo que les permite aprender representaciones de alto nivel de la información lingüística.
+
+2. **Entrenamiento en Datos Grandes**: Son entrenados en grandes conjuntos de datos de texto, como libros, sitios web, artículos, etc., lo que les permite adquirir un conocimiento general sobre el lenguaje humano.
+
+3. **Capacidades Generativas**: Una vez entrenados, pueden generar texto, responder
+
+[ Prompt: 1100.7 t/s | Generation: 68.7 t/s ]
+
+
+Exiting...

@@ -1,0 +1,14 @@
+
+
+Loading model... |0.00.114.469 E gguf_init_from_file: failed to open GGUF file '/home/loonbac/Projects/models/Qwen3-235B-A22B-Q4_K_M-00001-of-00005.gguf' (No such file or directory)
+0.00.114.516 E llama_model_load: error loading model: llama_model_loader: failed to load model from /home/loonbac/Projects/models/Qwen3-235B-A22B-Q4_K_M-00001-of-00005.gguf
+0.00.114.519 E llama_model_load_from_file_impl: failed to load model
+0.00.114.538 E common_fit_params: encountered an error while trying to fit params to free device memory: failed to load model
+0.00.114.543 E gguf_init_from_file: failed to open GGUF file '/home/loonbac/Projects/models/Qwen3-235B-A22B-Q4_K_M-00001-of-00005.gguf' (No such file or directory)
+0.00.114.546 E llama_model_load: error loading model: llama_model_loader: failed to load model from /home/loonbac/Projects/models/Qwen3-235B-A22B-Q4_K_M-00001-of-00005.gguf
+0.00.114.546 E llama_model_load_from_file_impl: failed to load model
+0.00.114.547 E cmn  common_init_: failed to load model '/home/loonbac/Projects/models/Qwen3-235B-A22B-Q4_K_M-00001-of-00005.gguf'
+0.00.114.548 E srv    load_model: failed to load model, '/home/loonbac/Projects/models/Qwen3-235B-A22B-Q4_K_M-00001-of-00005.gguf'
+0.00.114.994 E srv  llama_server: exiting due to model loading error
+llama_server exited with code 1
+-\ Error: the server exited before becoming ready

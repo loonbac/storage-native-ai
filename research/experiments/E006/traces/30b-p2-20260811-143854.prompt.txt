@@ -1,0 +1,1 @@
+prompt: Write a Python function that implements a LRU cache with O(1) operations, then explain how it works.

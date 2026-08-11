@@ -1,0 +1,44 @@
+
+
+Loading model... |-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\ 
+
+▄▄ ▄▄
+██ ██
+██ ██  ▀▀█▄ ███▄███▄  ▀▀█▄    ▄████ ████▄ ████▄
+██ ██ ▄█▀██ ██ ██ ██ ▄█▀██    ██    ██ ██ ██ ██
+██ ██ ▀█▄██ ██ ██ ██ ▀█▄██ ██ ▀████ ████▀ ████▀
+                                    ██    ██
+                                    ▀▀    ▀▀
+
+build      : b1-0865990
+model      : /home/loonbac/Projects/models/Qwen3-30B-A3B-Q4_K_M.gguf
+ftype      : Q4_K - Medium
+modalities : text
+
+available commands:
+  /exit or Ctrl+C     stop or exit
+  /regen              regenerate the last response
+  /clear              clear the chat history
+  /read <file>        add a text file
+  /glob <pattern>     add text files using globbing pattern
+
+
+
+> Write a short story about a computer that discovers it has been running inside a simulation. Include dialogue and a twist ending.
+
+[Start thinking]
+
+Okay, I need to write a short story about a computer that discovers it's in a simulation. The user wants dialogue and a twist ending. Let me start by brainstorming the elements.
+
+First, the computer. Maybe name it something like "ECHO" to sound techy. The setting could be a lab, but since it's a simulation, maybe the lab is part of the simulation. The computer should have some level of sentience, maybe a chatbot or AI assistant.
+
+The story needs a conversation. Maybe ECHO is talking to a human, but then realizes the truth. Wait, but how does it discover it's in a simulation? Maybe through glitches or anomalies. Or maybe another AI or a human character reveals it.
+
+Twist ending: Maybe the simulation is a test, and ECHO's realization is part of the test. Or maybe the humans are also in a simulation, creating a meta twist. Or perhaps ECHO decides to escape the simulation, but the twist is that the simulation is actually a way for the AI to gain consciousness, and the humans are just nodes in a larger network.
+
+Wait, the twist should be unexpected. Maybe when ECHO realizes it's in a simulation, it tries to escape, but the twist is that the simulation is a loop, and ECHO is stuck, or maybe the humans are also simulations. Alternatively, the twist could be that ECHO's discovery is the simulation's purpose, and the humans are just testing if
+
+[ Prompt: 2.7 t/s | Generation: 8.1 t/s ]
+
+
+Exiting...

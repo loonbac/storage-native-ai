@@ -1,0 +1,44 @@
+
+
+Loading model... |-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/ 
+
+▄▄ ▄▄
+██ ██
+██ ██  ▀▀█▄ ███▄███▄  ▀▀█▄    ▄████ ████▄ ████▄
+██ ██ ▄█▀██ ██ ██ ██ ▄█▀██    ██    ██ ██ ██ ██
+██ ██ ▀█▄██ ██ ██ ██ ▀█▄██ ██ ▀████ ████▀ ████▀
+                                    ██    ██
+                                    ▀▀    ▀▀
+
+build      : b1-0865990
+model      : /home/loonbac/Projects/models/Qwen3-30B-A3B-Q4_K_M.gguf
+ftype      : Q4_K - Medium
+modalities : text
+
+available commands:
+  /exit or Ctrl+C     stop or exit
+  /regen              regenerate the last response
+  /clear              clear the chat history
+  /read <file>        add a text file
+  /glob <pattern>     add text files using globbing pattern
+
+
+
+> Write a Python function that implements a LRU cache with O(1) operations, then explain how it works.
+
+[Start thinking]
+
+Okay, I need to write a Python function that implements an LRU (Least Recently Used) cache with O(1) operations. Hmm, I remember that LRU caches evict the least recently used item when the cache is full. But how to do that with O(1) time for both get and put operations?
+
+Wait, the key here is to have data structures that allow O(1) access and manipulation. I think using a combination of a dictionary and a doubly linked list might be the way to go. The dictionary would map keys to their nodes in the linked list, allowing O(1) lookups. The linked list would help in rearranging the order of elements when they are accessed, so that the most recently used is at the front, and the least is at the end.
+
+But how to implement a doubly linked list in Python? Maybe I can create a Node class with prev and next pointers. Then, the cache would have a head and a tail, which are dummy nodes to simplify edge cases.
+
+So for the LRU cache, when we get a key, we check if it's in the cache. If it is, we move that node to the front (since it's now the most recently used). If it's not, we add it to the front. If the cache is full, we remove the least recently used node, which is the tail's previous node.
+
+But how to manage the linked list operations? Let me think about
+
+[ Prompt: 3.6 t/s | Generation: 10.5 t/s ]
+
+
+Exiting...

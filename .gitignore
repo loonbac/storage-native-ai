@@ -1,0 +1,25 @@
+# Weight models and binary datasets
+models/
+*.gguf
+*.bin
+
+# Local tool forks (patch stored in tools/patches/0001-moe-routing-tracer.patch)
+tools/llama.cpp-b10333-fork/
+
+# Execution logs and temporary scratch files
+*.log
+*.log.io
+*.log.vram
+scratch/
+
+# Environment and system folders
+.pi/
+.atl/
+agente-ia/
+lost+found/
+
+# Build artifacts and python cache
+build/
+__pycache__/
+*.o
+*.so

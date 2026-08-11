@@ -1,0 +1,1 @@
+prompt: Prove that the square root of 2 is irrational. Show all steps clearly.

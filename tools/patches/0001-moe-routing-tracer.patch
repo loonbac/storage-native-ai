@@ -1,0 +1,151 @@
+diff --git a/src/llama-context.cpp b/src/llama-context.cpp
+index 19cca7d..8948fe5 100644
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -1318,7 +1318,35 @@ bool llama_context::set_adapter_cvec(
+     return res;
+ }
+ 
++// [CYCLE2-E002D] sched eval callback: capture expert indices by node NAME at copy time
++static bool llama_moe_trace_cb(struct ggml_tensor * t, bool ask, void * user_data) {
++    if (!ask || t == nullptr) return true;
++    const char * name = ggml_get_name(t);
++    if (name == nullptr || strncmp(name, "moe_trace_persist", 17) != 0) return true;
++    ggml_tensor * src0 = t->src[0];
++    if (src0 == nullptr || src0->data == nullptr) return true;
++    const int32_t il = atoi(name + 18);
++    const int64_t ne0 = src0->ne[0];
++    const int64_t ne1 = src0->ne[1];
++    const size_t nbytes = ggml_nbytes(src0);
++    if (ne0 <= 0 || ne1 <= 0 || nbytes != (size_t)(ne0 * ne1 * sizeof(int32_t))) return true;
++    std::vector<int32_t> idx((size_t)(ne0 * ne1) + 1);
++    idx[0] = (int32_t) ne0;
++    ggml_backend_tensor_get(src0, idx.data() + 1, 0, nbytes);
++    llm_graph_result::moe_trace_state * st = (llm_graph_result::moe_trace_state *) user_data;
++    if (st) st->collected.emplace_back(il, std::move(idx));
++    return true;
++}
++
+ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, llm_graph_type gtype, llama_memory_context_i * mctx, ggml_status & ret) {
++    // [CYCLE2-E002D] open trace file early so graph construction can capture expert indices
++    if (g_llama_moe_trace == nullptr) {
++        const char * trace_path = getenv("LLAMA_TRACE_MOE");
++        if (trace_path && trace_path[0] != '\0') {
++            g_llama_moe_trace = fopen(trace_path, "a");
++        }
++    }
++
+     if (mctx && !mctx->apply()) {
+         LLAMA_LOG_ERROR("%s: failed to apply memory context\n", __func__);
+         ret = GGML_STATUS_FAILED;
+@@ -1332,7 +1360,7 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
+     // in order to correctly reuse a graph, it's full topology has to be uniquely determined by these parameters
+     const auto gparams = graph_params(res, ubatch, mctx, gtype);
+ 
+-    if (!graph_reuse_disable && res->can_reuse(gparams)) {
++    if (!graph_reuse_disable && g_llama_moe_trace == nullptr && res->can_reuse(gparams)) {
+         //LLAMA_LOG_DEBUG("%s: reusing previous graph\n", __func__);
+ 
+         // with pipeline parallelism, the previous graph_compute_async may still be running
+@@ -1353,6 +1381,13 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
+ 
+         gf = model.build_graph(gparams);
+ 
++        // [CYCLE2-E002D] register tracing callback after graph build (captures by node name)
++        if (g_llama_moe_trace != nullptr) {
++            res->moe_trace.collected.clear();
++            res->moe_trace.pending.clear();
++            ggml_backend_sched_set_eval_callback(sched.get(), llama_moe_trace_cb, &res->moe_trace);
++        }
++
+         //LLAMA_LOG_INFO("graph build time: %.3f ms\n", (ggml_time_us() - t_start_us)/1000.0);
+ 
+         if (!gf) {
+@@ -1387,6 +1422,32 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
+ 
+     ret = GGML_STATUS_SUCCESS;
+ 
++    // [CYCLE2-E002D] dump captured expert routing traces
++    if (!res->moe_trace.collected.empty() && g_llama_moe_trace != nullptr) {
++        ggml_backend_sched_synchronize(sched.get());
++        const llama_token * toks = ubatch.token;
++        for (const auto & entry : res->moe_trace.collected) {
++            const int32_t il = entry.first;
++            const std::vector<int32_t> & v = entry.second;
++            if (v.size() < 2) continue;
++            const int32_t ne0 = v[0];
++            const int64_t n_entries = (int64_t)(v.size() - 1);
++            if (ne0 <= 0 || n_entries % ne0 != 0) continue;
++            const int64_t ne1 = n_entries / ne0;
++            for (int64_t tok = 0; tok < ne1; tok++) {
++                const int tid = (toks != nullptr) ? (int)toks[tok] : -1;
++                fprintf(g_llama_moe_trace, "%d %d %d", tid, (int)il, (int)ne0);
++                for (int64_t k = 0; k < ne0; k++) {
++                    fprintf(g_llama_moe_trace, " %d", (int)v[1 + k * ne1 + tok]);
++                }
++                fprintf(g_llama_moe_trace, "\n");
++            }
++        }
++        fflush(g_llama_moe_trace);
++        res->moe_trace.collected.clear();
++    }
++    res->moe_trace.pending.clear();
++
+     return res;
+ }
+ 
+diff --git a/src/llama-graph.cpp b/src/llama-graph.cpp
+index 2be3b75..2260ec7 100644
+--- a/src/llama-graph.cpp
++++ b/src/llama-graph.cpp
+@@ -10,6 +10,9 @@
+ #include "llama-kv-cache-dsa.h"
+ #include "llama-kv-cache-msa.h"
+ #include "llama-kv-cache-dsv4.h"
++// [CYCLE2-E002D] trace file for expert routing (opened via LLAMA_TRACE_MOE)
++FILE * g_llama_moe_trace = nullptr;
++
+ #include "llama-memory-hybrid.h"
+ #include "llama-memory-hybrid-iswa.h"
+ #include "llama-memory-recurrent.h"
+@@ -2031,6 +2034,15 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
+         cb(selected_experts->src[0], "ffn_moe_argsort", il);
+     }
+     cb(selected_experts, "ffn_moe_topk", il);
++        // [CYCLE2-E002D] capture selected expert indices for tracing
++        if (g_llama_moe_trace && res) {
++            ggml_tensor * persist = ggml_new_tensor_2d(ctx0, GGML_TYPE_I32, selected_experts->ne[0], selected_experts->ne[1]);
++                char persist_name[64];
++                snprintf(persist_name, sizeof(persist_name), "moe_trace_persist-%d", (int)il);
++                ggml_set_name(persist, persist_name);
++                ggml_build_forward_expand(gf, ggml_cpy(ctx0, selected_experts, persist));
++                res->moe_trace.pending.emplace_back(il, persist);
++        }
+ 
+     if (arch == LLM_ARCH_GROVEMOE && n_expert != hparams.n_expert) {
+         // TODO: Use scalar div instead when/if implemented
+diff --git a/src/llama-graph.h b/src/llama-graph.h
+index 32d8d39..1b28a9d 100644
+--- a/src/llama-graph.h
++++ b/src/llama-graph.h
+@@ -861,6 +861,13 @@ public:
+ 
+     virtual ~llm_graph_result() = default;
+ 
++        // [CYCLE2-E002D] expert routing trace state (captured in sched eval callback)
++    struct moe_trace_state {
++        std::vector<std::pair<int32_t, ggml_tensor *>> pending;      // (layer, selected_experts tensor) to capture
++        std::vector<std::pair<int32_t, std::vector<int32_t>>> collected; // (layer, expert indices) captured
++    };
++    moe_trace_state moe_trace;
++
+     ggml_tensor * get_inp_tokens()  const { return t_inp_tokens; }
+     ggml_tensor * get_logits()      const { return t_logits; }
+     ggml_tensor * get_embd()        const { return t_embd; }
+@@ -1337,3 +1344,6 @@ struct llm_graph_context {
+ 
+ // TODO: better name
+ int32_t llama_relative_position_bucket(llama_pos x, llama_pos y, uint64_t n_buckets, bool bidirectional);
++
++// [CYCLE2-E002D] global trace file (set via LLAMA_TRACE_MOE env var)
++extern FILE * g_llama_moe_trace;

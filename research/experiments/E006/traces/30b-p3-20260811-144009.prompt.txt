@@ -1,0 +1,1 @@
+prompt: Explain the difference between attention and state-space models for sequence modeling, with concrete examples of when each is preferable.

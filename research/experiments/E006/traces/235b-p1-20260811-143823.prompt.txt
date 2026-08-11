@@ -1,0 +1,1 @@
+prompt: Design a memory hierarchy for running a 100B-parameter neural network on a machine with 12GB of GPU memory. Explain the tradeoffs between SSD, RAM, and VRAM caching, and which layers or experts should be kept resident. Provide a concrete architecture with numbers.

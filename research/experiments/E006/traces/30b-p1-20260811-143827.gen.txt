@@ -1,0 +1,42 @@
+
+
+Loading model... |-\|/-\|/-\|/-\|/-\|/-\|/-\|/- 
+
+▄▄ ▄▄
+██ ██
+██ ██  ▀▀█▄ ███▄███▄  ▀▀█▄    ▄████ ████▄ ████▄
+██ ██ ▄█▀██ ██ ██ ██ ▄█▀██    ██    ██ ██ ██ ██
+██ ██ ▀█▄██ ██ ██ ██ ▀█▄██ ██ ▀████ ████▀ ████▀
+                                    ██    ██
+                                    ▀▀    ▀▀
+
+build      : b1-0865990
+model      : /home/loonbac/Projects/models/Qwen3-30B-A3B-Q4_K_M.gguf
+ftype      : Q4_K - Medium
+modalities : text
+
+available commands:
+  /exit or Ctrl+C     stop or exit
+  /regen              regenerate the last response
+  /clear              clear the chat history
+  /read <file>        add a text file
+  /glob <pattern>     add text files using globbing pattern
+
+
+
+> Prove that the square root of 2 is irrational. Show all steps clearly.
+
+[Start thinking]
+
+Okay, so I need to prove that the square root of 2 is irrational. Hmm, I remember that irrational numbers can't be expressed as a fraction of two integers. But how exactly do I start this proof? Let me think. I think it's a classic proof by contradiction. Yeah, that's right. So, I should assume the opposite of what I want to prove and then show that leads to a contradiction.
+
+Alright, so let me start by assuming that √2 is rational. If that's true, then it can be written as a fraction a/b where a and b are integers with no common factors other than 1, right? So, √2 = a/b. And since they have no common factors, the fraction is in its simplest form. Okay, so that's my starting point.
+
+Now, if I square both sides of that equation, I get 2 = a²/b². Then, multiplying both sides by b² gives me 2b² = a². So, a squared equals twice b squared. Hmm, what does that tell me about a?
+
+Well, if a² is even, then a must be even. Because if a were odd, then a squared would also be odd. So, since 2b² is even, a² is even, which means a is even. Let me write that down. So, a is even, so I can write a as 2 times some integer.
+
+[ Prompt: 51.2 t/s | Generation: 13.9 t/s ]
+
+
+Exiting...
