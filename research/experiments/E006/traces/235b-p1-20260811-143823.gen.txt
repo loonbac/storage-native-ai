@@ -38,4 +38,9 @@ Possible approaches: Maybe using techniques like model parallelism (splitting th
 
 Let me think about the parameters. Let's assume FP16 (2 bytes per parameter) for a rough calculation. 100B parameters * 2 bytes = 200GB. So 200GB total model size. But VRAM is only 12GB. So we need to keep most of the model in RAM and SSD. But RAM (system memory) is faster than SSD, so probably keep active parts in RAM and the rest on SSD. Wait, but how much system memory do we have? The question doesn't specify, but maybe we can assume some amount. But since it's a machine with 12GB GPU, maybe the system has more RAM, say 128GB or 256GB? Not sure. The problem doesn't state it, so maybe we have to make assumptions. Alternatively, perhaps the user expects us to outline a possible architecture, making reasonable assumptions.
 
-So here's the plan: partition the model into parts that can fit in VRAM, with other parts in RAM or SSD. The most critical parts (like the input/output layers, or layers that are reused, or the experts that are frequently used) would be kept in
+So here's the plan: partition the model into parts that can fit in VRAM, with other parts in RAM or SSD. The most critical parts (like the input/output layers, or layers that are reused, or the experts that are frequently used) would be kept in VRAM. The others can be swapped in
+
+[ Prompt: 0.7 t/s | Generation: 0.3 t/s ]
+
+
+Exiting...

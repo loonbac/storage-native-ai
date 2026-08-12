@@ -46,10 +46,29 @@ los cambios históricos se conservan en `history/`.
 22. **-ngl parcial (llama.cpp estándar) no cambia el cuello para MoE: sin caché de expertos** — 🟢 DEMOSTRADO (ngl=4, 6.3GB VRAM, 0.4 t/s invariante). RESULTADO EXPERIMENTAL.
 23. **Gap restante al North Star: reducir tráfico NVMe de 2.87 GB/token a ≤37.5 MB (factor ~76×)** — 🟢 DEMOSTRADO (aritmética). INFERENCIA. Sin límite físico que lo impida (BW combinado VRAM+RAM+PCIe sostiene 10.16 GB/token @40 t/s).
 
+### Ciclo 2 — Locality y caché de expertos (0004, 0005)
+
+24. **Locality de Qwen3-MoE: real, estable y MODERADA** — reuse distance P50=2 tokens, hit rate ~70% con ventana de 32 tokens por capa; distribución PLANA (top-25% cubre 35-42%); working set por capa 39-42% en ventana de 32; redundancia intra-token 71-83%. 🟢 DEMOSTRADO (tracer validado, 5 traces, 2 modelos). RESULTADO EXPERIMENTAL. (Refuta R-006: no es ley de potencia.)
+25. **H-006 REFUTADA: el Oracle (techo teórico) da 933 MB/token con 44 GB y 4139 MB/token con 12 GB en Qwen3-235B** — 25× y 110× el objetivo de 37.5 MB/token. Incluso con caché de 96 GB: 110 MB/token (3×). 🟢 DEMOSTRADO (simulación, Belady MIN). RESULTADO EXPERIMENTAL.
+26. **Propiedad limitante: working set de reutilización ~54 GB (ventana 32 tokens × 94 capas × 11.42 MB) supera la caché real** + distribución plana + cold misses (134.2 GB de expertos, ~110 MB/token a 1198 tokens). 🟢 DEMOSTRADO. INFERENCIA sobre hechos medidos.
+27. **La caché de expertos SÍ mejora lo práctico (~3×)**: 2.87 → ~0.95 GB/token estimado con 44 GB efectivos (VRAM+page cache) → ~1.2 t/s vs 0.4 baseline. Pero 12 GB solos rinden peor que el page cache (4.4 vs 2.87 GB/token). 🟢 DEMOSTRADO (simulación). INFERENCIA.
+28. **LRU ≈ Oracle (brecha 1-5%); LFU peor (10-30%)** — la locality es temporal, no frecuencial; el prefetch predictivo no puede ganar >5.5% (E006.5). 🟢 DEMOSTRADO. RESULTADO EXPERIMENTAL.
+29. **Nueva familia de hipótesis (ciclo 3)**: H-007 sparsity de activación, H-008 regeneración de pesos, H-009 arquitecturas con menor working set, H-010 contexto largo + caché ≥96GB (impráctico), H-011 caché real como mejora 3×. Prioridad: H-007 (ataca la raíz).
+
+### Ciclo 3 — Raíz del tráfico (0006-0010)
+
+30. **Sparsity de pesos del modelo: media 4.53% (CORREGIDO)** — la capa 0 (36.5%) es una anomalía de entrenamiento; las capas 5-18 tienen <2.7% de ceros (densas). Reducción real ~3% (2.87→2.78 GB/tok). H-007 REFUTADA. 🟢 DEMOSTRADO (script conservado).
+31. **Compresibilidad sin retrain (CORREGIDO): lossless 2-12% en capas densas** (entropía 3.9 bits; la capa 0 esparsa da 28% — no representativa); filas vivas con rango alto (93% — sin low-rank); SeedLM (4-8×) requiere retrain (NO TESTEABLE). H-008 REFUTADA. 🟢 DEMOSTRADO.
+32. **Layout físico: invarianza del LRU por página ante reordenamientos** — el layout NO reduce bytes NVMe (desperdicio ~0, reads de 3.5-5MB). Corrección: expertos pesan 12.24 MB (down Q6_K). H-010 REFUTADA. 🟢 DEMOSTRADO.
+33. **Top-k reducido: k=4 da −50% (1.44 GB/tok) con calidad aceptable; k=2 incoherente** — el límite de calidad está entre k=4 y k=6. Bonus: k reducido acelera (17→26 t/s 30B). H-011 PARCIAL. 🟢 DEMOSTRADO (calidad cualitativa).
+34. **Working set ∝ tamaño (relación ~40% constante entre 30B y 235B — propiedad de la arquitectura)**; el 30B alcanza 13.3 MB/tok @44GB y 16.9 @12GB (BAJO el objetivo); el 235B (WS 57.5GB) da 1157 MB/tok. **La ESCALA es el límite fundamental**: el objetivo de tráfico se alcanza con modelos que caben en la jerarquía; la frontera calidad/working-set es el problema abierto. H-009 PARCIAL. 🟢 DEMOSTRADO.
+35. **Combinación máxima en el 235B (sin retrain): ~1.36 GB/tok (36× objetivo, CORREGIDO)** — con H-007/H-008 casi nulos (3-5%), el top-k=4 (H-011) domina; ninguna combinación alcanza 37.5 MB/tok en el 235B; el 30B (calidad inferior) sí lo alcanza (13.3 MB/tok).
+
 ## Lo que NO sabemos todavía (incertidumbres críticas, ordenadas por valor informativo)
 
-1. **¿La caché de expertos explícita en VRAM reduce el tráfico NVMe lo suficiente?** (H-006,
-   E006) — la falsificación F-001 la señala como la siguiente prueba pendiente.
+1. ~~Caché de expertos (H-006)~~ — RESUELTA y REFUTADA (ciclo 2, falsification-002): el Oracle da
+   933 MB/token @44GB. Pendiente real: la sparsity de activación (H-007) y la regeneración de
+   pesos (H-008) — el ciclo 3.
 2. ¿Cuánto de la locality efectiva (78%) es locality de routing pura vs política LRU?
 3. ¿Puede el runtime solapar I/O y cómputo sin degradar (S5)?
 4. ¿Cuál es la calidad real de Qwen3-235B en Q4_K_M vs FP8/BF16 (S6)?
@@ -62,6 +81,6 @@ los cambios históricos se conservan en `history/`.
 - `bottleneck-analysis.md` — documento completo de cuellos de botella (task-4).
 - `../hypotheses/active.md` — hipótesis en curso (H-001…H-006).
 - `../hypotheses/falsification-001.md` — primera pasada de falsificación.
-- `../hypotheses/refuted.md` — predicciones/estrategias refutadas (R-001…R-004).
+- `../hypotheses/refuted.md` — predicciones/estrategias refutadas (R-001…R-006).
 - `../discoveries/` — descubrimientos 0001 (NVMe), 0002 (PCIe H2D), 0003 (Qwen3-235B offload).
 - `history/` — evolución del conocimiento (protocolo de corrección).

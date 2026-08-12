@@ -100,6 +100,19 @@ def main():
     gini_like = 1 - sum(sorted_freq) / (len(sorted_freq) * max(sorted_freq)) if sorted_freq else 0
     print(f"  max frecuencia: {max(freq.values())} | media: {total_act/len(freq):.1f} | ratio max/media: {max(freq.values())/(total_act/len(freq)):.1f}x")
 
+    # --- 2b) distribución por UNIDAD (capa, experto) — 12,032 unidades ---
+    unit_freq = Counter((layer, e) for tok, layer, exps in seq for e in exps)
+    total_units = n_layers * n_exp
+    print(f"\n--- 2b) distribución por unidad (capa, experto) — {total_units} unidades ---")
+    print(f"  unidades distintas usadas: {len(unit_freq)}/{total_units} ({len(unit_freq)/total_units*100:.1f}%)")
+    sf = sorted(unit_freq.values(), reverse=True)
+    if sf:
+        for pct, label in [(0.001, "top-0.1%"), (0.01, "top-1%"), (0.05, "top-5%"), (0.10, "top-10%")]:
+            n_top = max(1, int(total_units * pct))
+            covered = sum(sf[:n_top])
+            print(f"    {label} ({n_top} unidades): {covered/sum(sf)*100:.1f}% de las activaciones")
+        print(f"  max freq: {max(sf)} | media: {sum(sf)/len(sf):.1f} | ratio: {max(sf)/(sum(sf)/len(sf)):.1f}x")
+
     # --- 3) working set por ventana de W tokens (expertos distintos, por capa) ---
     print(f"\n--- 3) working set por ventana (expertos distintos activados en los últimos W tokens) ---")
     # construir secuencia temporal por capa: para cada capa, la lista de expertos en orden
@@ -119,8 +132,8 @@ def main():
         ws_avg = sum(ws)/len(ws) if ws else 0
         print(f"  W={W}: {ws_avg:.0f} expertos distintos promedio por capa (de 128) = {ws_avg/128*100:.0f}%")
         # bytes: expertos distintos × capas × bpe
-        mb_ws = ws_avg * n_layers * bpe_mb / 1024
-        print(f"        ≈ {mb_ws:.0f} MB si todo el working set de {W} tokens estuviera residente")
+        gb_ws = ws_avg * n_layers * bpe_mb / 1024
+        print(f"        ≈ {gb_ws:.0f} GB si todo el working set de {W} tokens estuviera residente")
 
     # --- 4) reuse distance (distancia entre activaciones consecutivas del mismo experto, por capa) ---
     print(f"\n--- 4) reuse distance por capa (activaciones consecutivas del mismo experto) ---")

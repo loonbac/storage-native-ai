@@ -1,0 +1,1 @@
+prompt: Explain how a mixture-of-experts transformer works, including expert routing, load balancing, and why activation sparsity helps efficiency. Give a detailed technical walkthrough.

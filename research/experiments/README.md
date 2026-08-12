@@ -35,3 +35,5 @@ E009 — combinaciones
 |---|---|---|---|
 | E001 | Baseline convencional en VRAM (Qwen2.5-7B Q4_K_M, 68.8 t/s) | 🟢 completado | 2026-08-11 |
 | E002 | Modelo fuera de VRAM (Nivel 0-1): Qwen3-235B 142GB, 0.4 t/s, NVMe saturado | 🟢 completado | 2026-08-11 |
+| E002d | Instrumentación del routing + traces (30B: 4 prompts, 235B: 2 prompts) | 🟢 completado | 2026-08-11 |
+| E006 | Caché de expertos: simulador Oracle/LRU/LFU + sweep (H-006 refutada) | 🟢 completado | 2026-08-11 |
